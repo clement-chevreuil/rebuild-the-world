@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="../">
 <title>Base SQLite locale</title>
-<link rel="stylesheet" href="../vendor-pack/vendor/bootstrap/bootstrap.min.css">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor-pack/vendor/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="sql/css/style.css">
 </head>
 <body>
 
@@ -44,11 +45,11 @@
   </main>
 
   <!-- Ordre important : moteur wasm intégré, puis loader sql.js, puis manager, puis schéma, db, app -->
-  <script src="../vendor-pack/vendor/sqlite/sql-wasm-base64.js"></script>
-  <script src="../vendor-pack/vendor/sqlite/sql-wasm.js"></script>
-  <script src="../vendor-pack/vendor/sqlite/sqlite-manager.js"></script>
-  <script src="js/schema.js"></script>
-  <script src="js/db.js"></script>
-  <script src="js/app.js"></script>
+  <script src="vendor-pack/vendor/sqlite/sql-wasm-base64.js"></script>
+  <script src="vendor-pack/vendor/sqlite/sql-wasm.js"></script>
+  <script src="vendor-pack/vendor/sqlite/sqlite-manager.js"></script>
+  <script src="sql/js/schema.js"></script>
+  <script src="sql/js/db.js"></script>
+  <script src="sql/js/app.js"></script>
 </body>
 </html>
