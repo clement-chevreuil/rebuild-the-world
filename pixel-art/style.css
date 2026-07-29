@@ -1,58 +1,122 @@
 :root {
-  --primary: #2c5f4f;
-  --secondary: #6b6b6b;
+  --primary: #0d6efd;
+  --success: #198754;
 }
 
-.controls-panel {
-  position: sticky;
-  top: 1rem;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.controls-panel .card-title {
-  color: var(--primary);
-  font-weight: 600;
+body {
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Navbar */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-size: 1.2rem;
+  margin-right: 2rem;
+}
+
+.form-control-sm {
+  font-size: 0.875rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.form-control-color {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.vr {
+  height: auto;
+  margin: 0.5rem 0;
+  opacity: 0.5;
+}
+
+/* Canvas wrapper */
+.canvas-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  overflow: auto;
+}
+
+/* Grille de pixels */
 .pixel-grid {
   display: grid;
   gap: 1px;
-  background-color: #ccc;
+  background-color: #999;
   padding: 1px;
   user-select: none;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .pixel {
   width: 20px;
   height: 20px;
   cursor: crosshair;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.05s;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.05s ease;
+  background-color: white;
 }
 
 .pixel:hover {
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
 }
 
-#status-text {
-  margin: 0;
-  color: var(--secondary);
+.pixel:active {
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2);
 }
 
-.form-control-color {
-  height: 3rem;
-  cursor: pointer;
-}
-
+/* Responsive */
 @media (max-width: 768px) {
+  .navbar-collapse {
+    gap: 0.5rem !important;
+  }
+
+  .navbar-nav {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.8rem !important;
+  }
+
+  .vr {
+    display: none;
+  }
+
   .pixel {
     width: 16px;
     height: 16px;
   }
+
+  .canvas-wrapper {
+    padding: 1rem;
+  }
 }
 
 @media (max-width: 576px) {
+  .navbar-brand {
+    margin-right: 0;
+  }
+
   .pixel {
     width: 12px;
     height: 12px;
+  }
+
+  input[type="number"] {
+    width: 50px !important;
   }
 }

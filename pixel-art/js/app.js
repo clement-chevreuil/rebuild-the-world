@@ -12,7 +12,10 @@ const App = (() => {
     document.getElementById('export-png-btn').addEventListener('click', () => Export.exportToPNG());
     document.getElementById('export-jpg-btn').addEventListener('click', () => Export.exportToJPG());
 
-    document.getElementById('pixel-grid').addEventListener('mousedown', () => {
+    document.getElementById('pixel-grid').addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('pixel')) {
+        handlePixelHover(e);
+      }
       document.getElementById('pixel-grid').addEventListener('mouseover', handlePixelHover);
     });
 
