@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base SQLite locale</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main class="page">
+    <h1>Modèles</h1>
+    <p id="status" class="status">Chargement…</p>
+
+    <section class="toolbar">
+      <button id="export-btn">⬇ Exporter en .db</button>
+      <label class="import-label">
+        ⬆ Importer un .db
+        <input type="file" id="import-file" accept=".db,.sqlite,.sqlite3">
+      </label>
+    </section>
+
+    <form id="add-form" class="add-form">
+      <input type="text" name="titre" placeholder="Titre *" required>
+      <input type="number" name="ordre" placeholder="Ordre">
+      <button type="submit">Ajouter</button>
+    </form>
+
+    <table id="modeles-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titre</th>
+          <th>Ordre</th>
+          <th>Créé le</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="5" class="empty">Chargement…</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <!-- Ordre important : moteur wasm intégré, puis loader sql.js, puis schéma, db, app -->
+  <script src="sql-wasm-base64.js"></script>
+  <script src="sql-wasm.js"></script>
+  <script src="schema.js"></script>
+  <script src="db.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
