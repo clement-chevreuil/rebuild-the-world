@@ -1,20 +1,8 @@
 :root {
-  --bg: #fbfaf8;
-  --text: #1f1f1f;
-  --muted: #6b6b6b;
   --accent: #2c5f4f;
+  --muted: #6b6b6b;
   --border: #e4e0da;
   --code-bg: #f1efe9;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Georgia", "Iowan Old Style", serif;
-  line-height: 1.65;
 }
 
 .page {
@@ -93,11 +81,6 @@ body {
   margin: 2.5em 0;
 }
 
-.loading, .error {
-  color: var(--muted);
-  font-style: italic;
-}
-
 .error {
   color: #a33;
 }
@@ -110,20 +93,9 @@ body {
   font-size: 0.95rem;
 }
 
-.menu-hint {
-  margin-bottom: 2rem;
-}
-
-.menu-hint a {
-  color: var(--accent);
-  font-weight: bold;
-  text-decoration: none;
-}
-
 .menu-list {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
 .menu-list li {
@@ -133,15 +105,9 @@ body {
 .menu-list a {
   display: block;
   padding: 0.9rem 0.3rem;
-  color: var(--text);
+  color: inherit;
   text-decoration: none;
   font-size: 1.05rem;
-}
-
-.menu-list li.empty {
-  color: var(--muted);
-  font-style: italic;
-  padding: 0.9rem 0.3rem;
 }
 
 .toolbar {
@@ -161,13 +127,9 @@ body {
   cursor: pointer;
 }
 
-/* Rendu propre quand on imprime / exporte en PDF via le navigateur */
 @media print {
   .no-print {
     display: none !important;
-  }
-  body {
-    background: white;
   }
   .page {
     max-width: none;
@@ -186,12 +148,10 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  font-size: 0.95rem;
 }
 
 .create-form input[type="text"],
 .create-form textarea {
-  font-family: inherit;
   font-size: 1rem;
   padding: 0.6rem 0.7rem;
   border: 1px solid var(--border);
@@ -222,11 +182,4 @@ body {
   padding: 1rem;
   font-size: 0.95rem;
   line-height: 1.6;
-}
-
-.result code {
-  background: var(--code-bg);
-  padding: 0.1em 0.4em;
-  border-radius: 4px;
-  font-size: 0.9em;
 }

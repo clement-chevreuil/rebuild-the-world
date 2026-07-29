@@ -4,4 +4,5 @@
 
 const PAGES = [
   { slug: "exemple", titre: "Exemple" },
+  { slug: "test", titre: "Test" },
 ];
