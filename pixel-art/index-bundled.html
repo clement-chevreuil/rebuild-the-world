@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Art Editor</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --primary: #0d6efd;
+      --success: #198754;
+      --warning: #ffc107;
+      --dark: #212529;
+      --light: #f8f9fa;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: var(--light);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    .navbar {
+      background: var(--dark);
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      gap: 1rem;
+    }
+
+    .navbar-brand {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-right: 2rem;
+    }
+
+    .navbar-toggler {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: none;
+      padding: 0;
+    }
+
+    .navbar-content {
+      display: flex;
+      width: 100%;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .navbar-item-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .navbar-item-group label {
+      color: white;
+      font-size: 0.875rem;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .navbar-divider {
+      width: 1px;
+      height: 1.5rem;
+      background: rgba(255,255,255,0.3);
+      margin: 0 0.5rem;
+    }
+
+    .navbar-spacer {
+      margin-left: auto;
+    }
+
+    /* Form Controls */
+    input[type="number"],
+    input[type="color"],
+    input[type="text"],
+    textarea,
+    select {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    textarea,
+    select {
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+    }
+
+    input[type="number"].form-control-sm,
+    input[type="text"].form-control-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.875rem;
+      width: 60px;
+    }
+
+    input[type="color"] {
+      width: 45px;
+      height: 38px;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    button {
+      font-family: inherit;
+      font-size: 0.875rem;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid transparent;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: white;
+      color: #212529;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.375rem 0.75rem;
+      font-weight: 500;
+      text-decoration: none;
+      border-radius: 0.25rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+    }
+
+    .btn-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #0b5ed7;
+      border-color: #0b5ed7;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+
+    .btn-success:hover:not(:disabled) {
+      background: #157347;
+      border-color: #157347;
+    }
+
+    .btn-outline-light {
+      background: transparent;
+      color: white;
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .btn-outline-light:hover:not(:disabled) {
+      background: rgba(255,255,255,0.1);
+      border-color: white;
+    }
+
+    .btn-outline-warning {
+      background: transparent;
+      color: var(--warning);
+      border-color: var(--warning);
+    }
+
+    .btn-outline-warning:hover:not(:disabled) {
+      background: var(--warning);
+      color: #212529;
+    }
+
+    button:disabled,
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0;
+    }
+
+    .btn-group .btn {
+      border-radius: 0;
+      margin: 0;
+    }
+
+    .btn-group .btn:first-child {
+      border-radius: 0.25rem 0 0 0.25rem;
+    }
+
+    .btn-group .btn:last-child {
+      border-radius: 0 0.25rem 0.25rem 0;
+    }
+
+    /* Status */
+    .status-bar {
+      background: var(--light);
+      border-bottom: 1px solid #dee2e6;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+
+    /* Canvas */
+    .canvas-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      overflow: auto;
+    }
+
+    .pixel-grid {
+      display: grid;
+      gap: 1px;
+      background-color: #999;
+      padding: 1px;
+      user-select: none;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .pixel {
+      width: 20px;
+      height: 20px;
+      cursor: crosshair;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      transition: all 0.05s ease;
+      background-color: white;
+    }
+
+    .pixel:hover {
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+    }
+
+    .pixel:active {
+      box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .navbar-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+      }
+
+      .navbar-divider {
+        display: none;
+      }
+
+      .navbar-spacer {
+        margin-left: 0;
+      }
+
+      .pixel {
+        width: 16px;
+        height: 16px;
+      }
+
+      .canvas-wrapper {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .navbar-brand {
+        margin-right: 0;
+      }
+
+      .pixel {
+        width: 12px;
+        height: 12px;
+      }
+
+      input[type="number"].form-control-sm {
+        width: 50px !important;
+      }
+
+      .navbar-content {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <span class="navbar-brand">🎨 Pixel Art</span>
+
+    <div class="navbar-content">
+      <!-- Nouveau tableau -->
+      <div class="navbar-item-group">
+        <label>Taille:</label>
+        <input type="number" id="width-input" class="form-control-sm" value="32" min="1" placeholder="L">
+        <span style="color: white;">×</span>
+        <input type="number" id="height-input" class="form-control-sm" value="32" min="1" placeholder="H">
+        <button id="create-btn" class="btn btn-primary btn-sm">Créer</button>
+      </div>
+
+      <div class="navbar-divider"></div>
+
+      <!-- Couleur -->
+      <div class="navbar-item-group">
+        <label>Couleur:</label>
+        <input type="color" id="color-picker" value="#000000">
+      </div>
+
+      <div class="navbar-divider"></div>
+
+      <!-- Historique -->
+      <div class="navbar-item-group">
+        <button id="undo-btn" class="btn btn-outline-light btn-sm" disabled title="Annuler">↶</button>
+        <button id="redo-btn" class="btn btn-outline-light btn-sm" disabled title="Refaire">↷</button>
+      </div>
+
+      <div class="navbar-divider"></div>
+
+      <!-- Actions -->
+      <button id="clear-btn" class="btn btn-outline-warning btn-sm" disabled>🗑 Effacer</button>
+
+      <div class="navbar-spacer"></div>
+
+      <!-- Export -->
+      <div class="btn-group">
+        <button id="export-png-btn" class="btn btn-success btn-sm" disabled>PNG</button>
+        <button id="export-jpg-btn" class="btn btn-success btn-sm" disabled>JPG</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Statut -->
+  <div class="status-bar">
+    <small id="status-text">En attente…</small>
+  </div>
+
+  <!-- Canvas principal -->
+  <div class="canvas-wrapper">
+    <div id="pixel-grid" class="pixel-grid"></div>
+  </div>
+
+  <script>
+    // History Module
+    const History = (() => {
+      let stack = [];
+      let currentIndex = -1;
+
+      const push = (state) => {
+        stack = stack.slice(0, currentIndex + 1);
+        stack.push(JSON.parse(JSON.stringify(state)));
+        currentIndex++;
+      };
+
+      const undo = () => {
+        if (canUndo()) {
+          currentIndex--;
+          return stack[currentIndex];
+        }
+        return null;
+      };
+
+      const redo = () => {
+        if (canRedo()) {
+          currentIndex++;
+          return stack[currentIndex];
+        }
+        return null;
+      };
+
+      const canUndo = () => currentIndex > 0;
+      const canRedo = () => currentIndex < stack.length - 1;
+
+      const clear = () => {
+        stack = [];
+        currentIndex = -1;
+      };
+
+      return { push, undo, redo, canUndo, canRedo, clear };
+    })();
+
+    // Canvas Module
+    const Canvas = (() => {
+      let grid = null;
+      let width = 0;
+      let height = 0;
+      const pixelSize = 20;
+
+      const init = (w, h) => {
+        width = w;
+        height = h;
+        grid = Array(height).fill(null).map(() => Array(width).fill('#ffffff'));
+        render();
+      };
+
+      const render = () => {
+        const container = document.getElementById('pixel-grid');
+        container.innerHTML = '';
+        container.style.gridTemplateColumns = `repeat(${width}, ${pixelSize}px)`;
+        container.style.gridTemplateRows = `repeat(${height}, ${pixelSize}px)`;
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            pixel.style.backgroundColor = grid[y][x];
+            pixel.dataset.x = x;
+            pixel.dataset.y = y;
+            pixel.addEventListener('click', (e) => {
+              handlePixelClick(x, y, e);
+            });
+            container.appendChild(pixel);
+          }
+        }
+      };
+
+      const handlePixelClick = (x, y, e) => {
+        if (e.buttons === 1 || e.type === 'click') {
+          const color = document.getElementById('color-picker').value;
+          setPixel(x, y, color);
+        }
+      };
+
+      const setPixel = (x, y, color) => {
+        if (x >= 0 && x < width && y >= 0 && y < height) {
+          grid[y][x] = color;
+          const pixel = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+          if (pixel) pixel.style.backgroundColor = color;
+        }
+      };
+
+      const getState = () => JSON.parse(JSON.stringify(grid));
+
+      const setState = (newGrid) => {
+        grid = JSON.parse(JSON.stringify(newGrid));
+        render();
+      };
+
+      const clear = () => {
+        grid = grid.map(row => row.map(() => '#ffffff'));
+        render();
+      };
+
+      const toCanvas = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            ctx.fillStyle = grid[y][x];
+            ctx.fillRect(x, y, 1, 1);
+          }
+        }
+
+        return canvas;
+      };
+
+      const isInitialized = () => grid !== null;
+
+      return { init, render, setPixel, getState, setState, clear, toCanvas, isInitialized, getWidth: () => width, getHeight: () => height };
+    })();
+
+    // Export Module
+    const Export = (() => {
+      const exportToPNG = () => {
+        const canvas = Canvas.toCanvas();
+        const upscaledCanvas = upscaleCanvas(canvas, 10);
+        downloadImage(upscaledCanvas, 'pixel-art.png', 'image/png');
+      };
+
+      const exportToJPG = () => {
+        const canvas = Canvas.toCanvas();
+        const upscaledCanvas = upscaleCanvas(canvas, 10);
+        downloadImage(upscaledCanvas, 'pixel-art.jpg', 'image/jpeg');
+      };
+
+      const upscaleCanvas = (canvas, scale) => {
+        const upscaled = document.createElement('canvas');
+        upscaled.width = canvas.width * scale;
+        upscaled.height = canvas.height * scale;
+        const ctx = upscaled.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(canvas, 0, 0, upscaled.width, upscaled.height);
+        return upscaled;
+      };
+
+      const downloadImage = (canvas, filename, mimeType) => {
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(url);
+        }, mimeType);
+      };
+
+      return { exportToPNG, exportToJPG };
+    })();
+
+    // App Module
+    const App = (() => {
+      const init = () => {
+        setupEventListeners();
+        updateUIState();
+      };
+
+      const setupEventListeners = () => {
+        document.getElementById('create-btn').addEventListener('click', handleCreate);
+        document.getElementById('clear-btn').addEventListener('click', handleClear);
+        document.getElementById('undo-btn').addEventListener('click', handleUndo);
+        document.getElementById('redo-btn').addEventListener('click', handleRedo);
+        document.getElementById('export-png-btn').addEventListener('click', () => Export.exportToPNG());
+        document.getElementById('export-jpg-btn').addEventListener('click', () => Export.exportToJPG());
+
+        document.getElementById('pixel-grid').addEventListener('mousedown', (e) => {
+          if (e.target.classList.contains('pixel')) {
+            handlePixelHover(e);
+          }
+          document.getElementById('pixel-grid').addEventListener('mouseover', handlePixelHover);
+        });
+
+        document.getElementById('pixel-grid').addEventListener('mouseup', () => {
+          document.getElementById('pixel-grid').removeEventListener('mouseover', handlePixelHover);
+          saveState();
+        });
+      };
+
+      const handleCreate = () => {
+        const width = parseInt(document.getElementById('width-input').value, 10);
+        const height = parseInt(document.getElementById('height-input').value, 10);
+
+        if (width < 1 || height < 1 || isNaN(width) || isNaN(height)) {
+          alert('Entrez des valeurs positives');
+          return;
+        }
+
+        History.clear();
+        Canvas.init(width, height);
+        saveState();
+        updateUIState();
+        updateStatus(`Tableau ${width}×${height} créé`);
+      };
+
+      const handlePixelHover = (e) => {
+        if (e.target.classList.contains('pixel')) {
+          const x = parseInt(e.target.dataset.x, 10);
+          const y = parseInt(e.target.dataset.y, 10);
+          const color = document.getElementById('color-picker').value;
+          Canvas.setPixel(x, y, color);
+        }
+      };
+
+      const handleClear = () => {
+        if (confirm('Êtes-vous sûr de vouloir effacer tout le dessin?')) {
+          Canvas.clear();
+          saveState();
+          updateUIState();
+          updateStatus('Dessin effacé');
+        }
+      };
+
+      const handleUndo = () => {
+        const state = History.undo();
+        if (state) {
+          Canvas.setState(state);
+          updateUIState();
+          updateStatus('Annulé');
+        }
+      };
+
+      const handleRedo = () => {
+        const state = History.redo();
+        if (state) {
+          Canvas.setState(state);
+          updateUIState();
+          updateStatus('Refait');
+        }
+      };
+
+      const saveState = () => {
+        if (Canvas.isInitialized()) {
+          History.push(Canvas.getState());
+        }
+      };
+
+      const updateUIState = () => {
+        const isInitialized = Canvas.isInitialized();
+        document.getElementById('clear-btn').disabled = !isInitialized;
+        document.getElementById('undo-btn').disabled = !History.canUndo();
+        document.getElementById('redo-btn').disabled = !History.canRedo();
+        document.getElementById('export-png-btn').disabled = !isInitialized;
+        document.getElementById('export-jpg-btn').disabled = !isInitialized;
+      };
+
+      const updateStatus = (msg) => {
+        document.getElementById('status-text').textContent = msg;
+      };
+
+      return { init };
+    })();
+
+    document.addEventListener('DOMContentLoaded', App.init);
+  </script>
+</body>
+</html>
