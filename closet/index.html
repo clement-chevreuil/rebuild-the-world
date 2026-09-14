@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon dressing</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="page">
+    <header class="topbar">
+      <div>
+        <h1>Mon dressing</h1>
+        <p id="summary" class="summary">Chargement…</p>
+      </div>
+      <button id="legend-btn" class="legend-btn" title="Récapitulatif des symboles" aria-label="Récapitulatif des symboles">📖</button>
+    </header>
+
+    <input type="search" id="search-input" class="search-input" placeholder="Rechercher un article">
+
+    <div id="category-pills" class="pills"></div>
+
+    <div id="content"></div>
+
+    <div class="toolbar-mini">
+      <button id="export-btn" class="link-btn">⬇ Exporter en .db</button>
+      <label class="link-btn file-import-label">
+        ⬆ Importer un .db
+        <input type="file" id="import-file" accept=".db,.sqlite,.sqlite3" hidden>
+      </label>
+      <button id="disk-sync-btn" class="link-btn">💾 Activer la sauvegarde disque</button>
+    </div>
+
+    <p id="status" class="status">Données enregistrées localement</p>
+  </div>
+
+  <button id="fab" class="fab" aria-label="Ajouter un article">+</button>
+
+  <!-- Modal : ajouter / modifier un article -->
+  <div id="article-modal" class="modal-overlay">
+    <div class="modal">
+      <h2 id="modal-title">Ajouter un article</h2>
+      <form id="article-form">
+        <label class="field">
+          <span class="field-label">Nom</span>
+          <input type="text" name="nom" placeholder="ex : Pull en laine gris" required>
+        </label>
+
+        <div class="field-label">Catégorie</div>
+        <div class="segmented" id="categorie-segmented"></div>
+        <input type="hidden" name="categorie" id="categorie-value">
+
+        <div class="modal-row">
+          <label class="field">
+            <span class="field-label">Type</span>
+            <input type="text" name="type" id="type-input" list="type-suggestions" placeholder="ex : Pull">
+            <datalist id="type-suggestions"></datalist>
+          </label>
+          <label class="field">
+            <span class="field-label">Textile</span>
+            <select name="textile" id="textile-select">
+              <option value="">Choisir…</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="field-label">Photo (optionnel)</div>
+        <div class="file-row">
+          <label class="file-btn">
+            Choisir un fichier
+            <input type="file" id="image-input" accept="image/*" hidden>
+          </label>
+          <span id="file-name" class="file-name">Aucun fichier choisi</span>
+        </div>
+        <div id="image-preview"></div>
+
+        <h3 class="care-title">Entretien</h3>
+        <div id="care-pickers"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="link-btn" id="cancel-article">Annuler</button>
+          <button type="submit" class="btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal : récapitulatif des symboles -->
+  <div id="legend-modal" class="modal-overlay">
+    <div class="modal modal-legend">
+      <h2>Récapitulatif des symboles</h2>
+      <div id="legend-content"></div>
+      <div class="modal-actions">
+        <button type="button" class="link-btn" id="close-legend">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ordre important : moteur wasm intégré, puis loader sql.js, puis manager, puis schéma, db, app -->
+  <script src="../vendor-pack/vendor/sqlite/sql-wasm-base64.js"></script>
+  <script src="../vendor-pack/vendor/sqlite/sql-wasm.js"></script>
+  <script src="../vendor-pack/vendor/sqlite/sqlite-manager.js"></script>
+  <script src="../vendor-pack/vendor/fs-sync/disk-sync.js"></script>
+  <script src="js/schema.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
