@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon frigo</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- Vue : Frigo -->
+    <section id="view-frigo" class="view active">
+      <header class="topbar">
+        <div>
+          <h1>Mon frigo</h1>
+          <p id="summary" class="summary">Chargement…</p>
+        </div>
+        <button id="bell-btn" class="bell-btn" title="Activer les rappels" aria-label="Notifications">
+          🔔<span id="bell-dot" class="bell-dot" hidden></span>
+        </button>
+      </header>
+
+      <div id="alert-banner" class="alert-banner" hidden>
+        <span class="alert-icon">⚠</span>
+        <span id="alert-text"></span>
+      </div>
+
+      <input type="search" id="search-input" class="search-input" placeholder="Rechercher un aliment">
+
+      <div id="category-pills" class="pills"></div>
+      <div id="location-pills" class="pills pills-secondary"></div>
+
+      <div id="content"></div>
+    </section>
+
+    <!-- Vue : Courses -->
+    <section id="view-courses" class="view">
+      <header class="topbar">
+        <div>
+          <h1>Liste de courses</h1>
+          <p id="courses-summary" class="summary">Chargement…</p>
+        </div>
+      </header>
+
+      <form id="course-form" class="course-form">
+        <input type="text" id="course-input" placeholder="Ajouter un article…" required>
+        <button type="submit" class="btn-primary">Ajouter</button>
+      </form>
+
+      <div id="courses-list"></div>
+
+      <div class="toolbar-mini">
+        <button id="clear-achetes-btn" class="link-btn">Vider les articles achetés</button>
+      </div>
+    </section>
+
+    <!-- Vue : Historique -->
+    <section id="view-historique" class="view">
+      <header class="topbar">
+        <div>
+          <h1>Historique</h1>
+          <p class="summary">Aliments consommés ou jetés</p>
+        </div>
+      </header>
+
+      <div id="historique-list"></div>
+    </section>
+
+    <div class="toolbar-mini">
+      <button id="export-btn" class="link-btn">⬇ Exporter en .db</button>
+      <label class="link-btn file-import-label">
+        ⬆ Importer un .db
+        <input type="file" id="import-file" accept=".db,.sqlite,.sqlite3" hidden>
+      </label>
+      <button id="disk-sync-btn" class="link-btn">💾 Activer la sauvegarde disque</button>
+    </div>
+
+    <p id="status" class="status">Données enregistrées localement</p>
+  </div>
+
+  <button id="fab" class="fab" aria-label="Ajouter un aliment">+</button>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-view="frigo">
+      <span class="nav-icon">🧊</span>
+      <span>Frigo</span>
+    </button>
+    <button class="nav-btn" data-view="courses">
+      <span class="nav-icon">🛒</span>
+      <span>Courses</span>
+    </button>
+    <button class="nav-btn" data-view="historique">
+      <span class="nav-icon">🕐</span>
+      <span>Historique</span>
+    </button>
+  </nav>
+
+  <!-- Modal : ajouter un aliment -->
+  <div id="add-modal" class="modal-overlay">
+    <div class="modal">
+      <h2>Ajouter un aliment</h2>
+      <form id="add-form">
+        <label class="field">
+          <span class="field-label">Nom</span>
+          <input type="text" name="nom" required>
+        </label>
+
+        <div class="modal-row">
+          <label class="field">
+            <span class="field-label">Quantité</span>
+            <input type="text" name="quantite" placeholder="ex: 200g">
+          </label>
+          <label class="field">
+            <span class="field-label">Péremption</span>
+            <input type="date" name="peremption" required>
+          </label>
+        </div>
+
+        <label class="field">
+          <span class="field-label">Catégorie</span>
+          <select name="type" id="category-select" required>
+            <option value="">Choisir…</option>
+          </select>
+        </label>
+
+        <div class="field-label">Emplacement</div>
+        <div class="segmented" id="emplacement-segmented"></div>
+        <input type="hidden" name="emplacement" id="emplacement-value" value="Frigo">
+
+        <div class="field-label">Photo (optionnel)</div>
+        <div class="file-row">
+          <label class="file-btn">
+            Choisir un fichier
+            <input type="file" id="image-input" accept="image/*" hidden>
+          </label>
+          <span id="file-name" class="file-name">Aucun fichier choisi</span>
+        </div>
+        <div id="image-preview"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="link-btn" id="cancel-add">Annuler</button>
+          <button type="submit" class="btn-primary">Ajouter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal : tout consommé ? -->
+  <div id="consumed-modal" class="modal-overlay">
+    <div class="modal modal-sm">
+      <h2 id="consumed-item-name"></h2>
+      <p>Tout a été consommé ?</p>
+      <div class="modal-actions modal-actions-split">
+        <button id="consumed-all-btn" class="btn-primary">Oui, tout</button>
+        <button id="consumed-partial-btn" class="btn-secondary">Une partie</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal : quantité consommée -->
+  <div id="partial-modal" class="modal-overlay">
+    <div class="modal modal-sm">
+      <h2 id="partial-item-name"></h2>
+      <p id="partial-stock-label"></p>
+      <input type="text" id="partial-input" placeholder="Ex: 2, 200g">
+      <div class="modal-actions">
+        <button type="button" class="link-btn" id="cancel-partial">Annuler</button>
+        <button id="confirm-partial-btn" class="btn-primary">Mettre à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ordre important : moteur wasm intégré, puis loader sql.js, puis manager, puis schéma, db, app -->
+  <script src="../vendor-pack/vendor/sqlite/sql-wasm-base64.js"></script>
+  <script src="../vendor-pack/vendor/sqlite/sql-wasm.js"></script>
+  <script src="../vendor-pack/vendor/sqlite/sqlite-manager.js"></script>
+  <script src="../vendor-pack/vendor/fs-sync/disk-sync.js"></script>
+  <script src="js/schema.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

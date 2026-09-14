@@ -79,7 +79,8 @@ function buildPageHtml(titre) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${safeTitre}</title>
-<link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="../../../vendor-pack/vendor/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
 
@@ -98,7 +99,7 @@ function buildPageHtml(titre) {
   </main>
 
   <script src="content.js"></script>
-  <script src="../../script.js"></script>
+  <script src="../../js/script.js"></script>
 </body>
 </html>
 `;

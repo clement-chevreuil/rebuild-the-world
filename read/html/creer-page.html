@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créer une page</title>
+<link rel="stylesheet" href="../../vendor-pack/vendor/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <main class="page">
+    <a href="../index.html" class="back-link">← Retour au menu</a>
+    <h1>Créer une nouvelle page</h1>
+
+    <form id="create-form" class="create-form">
+      <label>
+        Titre de la page
+        <input type="text" name="titre" placeholder="Ex : Recette de crêpes" required>
+      </label>
+
+      <label>
+        <input type="checkbox" name="isMarkdown" checked>
+        Le texte est écrit en Markdown (titres #, **gras**, etc.)
+      </label>
+
+      <label>
+        Contenu
+        <textarea name="contenu" rows="12" placeholder="Colle ou écris ton texte ici…" required></textarea>
+      </label>
+
+      <button type="submit">Générer les fichiers de la page</button>
+    </form>
+
+    <div id="result" class="result"></div>
+
+    <h2>Pages déjà créées avec cet outil</h2>
+    <ul id="existing-list" class="menu-list"></ul>
+  </main>
+
+  <script src="../js/creer-page.js"></script>
+</body>
+</html>

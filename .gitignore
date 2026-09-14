@@ -1,0 +1,3 @@
+.env
+food.db
+cron/run-check.log
