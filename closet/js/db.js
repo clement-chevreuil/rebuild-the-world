@@ -30,6 +30,40 @@ function rowsFromResult(res) {
   return values.map((row) => Object.fromEntries(row.map((v, i) => [columns[i], v])));
 }
 
+function queryAll(sql, params = []) {
+  const stmt = db.prepare(sql);
+  stmt.bind(params);
+  const rows = [];
+  while (stmt.step()) rows.push(stmt.getAsObject());
+  stmt.free();
+  return rows;
+}
+
+// ==== Catégories / types ====
+
+function getCategories() {
+  return queryAll("SELECT id, nom FROM categories ORDER BY ordre, nom").map((c) => c.nom);
+}
+
+function getTypes(categorie) {
+  return queryAll(
+    `SELECT t.nom FROM types t
+     JOIN categories c ON c.id = t.categorie_id
+     WHERE c.nom = ?
+     ORDER BY t.nom`,
+    [categorie]
+  ).map((t) => t.nom);
+}
+
+// Enregistre le type pour la catégorie s'il n'existe pas encore (insensible à la casse)
+function ensureType(nom, categorie) {
+  if (!nom) return;
+  db.run(
+    "INSERT OR IGNORE INTO types (nom, categorie_id) SELECT ?, id FROM categories WHERE nom = ?",
+    [nom, categorie]
+  );
+}
+
 // ==== Requêtes ====
 
 function getArticles({ categorie, search } = {}) {
@@ -82,6 +116,7 @@ function insertArticle(data) {
     data.symbole_pressing || null,
   ]);
   stmt.free();
+  ensureType(data.type, data.categorie);
   persist();
 }
 
@@ -106,6 +141,7 @@ function updateArticle(id, data) {
     id,
   ]);
   stmt.free();
+  ensureType(data.type, data.categorie);
   persist();
 }
 
@@ -121,6 +157,7 @@ function exportDatabase() {
 async function loadDatabaseFromFile(file) {
   await manager.importFromFile(file, (await manager.init(SQL_WASM_BASE64, SCHEMA_SQL)).sqlEngine);
   db = manager.getDatabase();
+  db.run(SCHEMA_SQL);
   persist();
 }
 

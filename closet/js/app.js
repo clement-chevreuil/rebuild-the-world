@@ -44,7 +44,7 @@ function setStatus(msg, isError = false) {
 // ==== Filtres ====
 
 function buildPills() {
-  categoryPillsEl.innerHTML = ["Toutes", ...CATEGORIES]
+  categoryPillsEl.innerHTML = ["Toutes", ...getCategories()]
     .map((cat) => `<button class="pill${cat === filterCategorie ? " active" : ""}" data-cat="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`)
     .join("");
 
@@ -127,7 +127,7 @@ function renderCard(item) {
 // ==== Modal : ajouter / modifier ====
 
 function buildCategorieSegmented() {
-  categorieSegmented.innerHTML = CATEGORIES
+  categorieSegmented.innerHTML = getCategories()
     .map((cat, i) => `<button type="button" class="seg-btn${i === 0 ? " active" : ""}" data-value="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`)
     .join("");
 
@@ -142,7 +142,7 @@ function buildCategorieSegmented() {
 }
 
 function updateTypeSuggestions(categorie) {
-  const suggestions = TYPE_SUGGESTIONS[categorie] || [];
+  const suggestions = getTypes(categorie);
   typeSuggestions.innerHTML = suggestions.map((t) => `<option value="${escapeHtml(t)}">`).join("");
 }
 
@@ -198,9 +198,10 @@ function resetModal() {
   careSelection = {};
   imagePreview.innerHTML = "";
   fileName.textContent = "Aucun fichier choisi";
+  const [firstCategorie] = getCategories();
   categorieSegmented.querySelectorAll(".seg-btn").forEach((b, i) => b.classList.toggle("active", i === 0));
-  categorieValue.value = CATEGORIES[0];
-  updateTypeSuggestions(CATEGORIES[0]);
+  categorieValue.value = firstCategorie;
+  updateTypeSuggestions(firstCategorie);
   renderCarePickers();
 }
 
@@ -310,6 +311,7 @@ document.getElementById("import-file").addEventListener("change", async (e) => {
   try {
     setStatus("Import en cours…");
     await loadDatabaseFromFile(file);
+    buildCategorieSegmented();
     refresh();
     setStatus(`Base "${file.name}" importée.`);
   } catch (err) {
@@ -376,10 +378,9 @@ legendModal.addEventListener("click", (e) => {
 async function boot() {
   try {
     setStatus("Initialisation de la base…");
-    buildCategorieSegmented();
     buildTextileOptions();
-    updateTypeSuggestions(CATEGORIES[0]);
     await initDatabase();
+    buildCategorieSegmented();
     updateDiskSyncLabel(!!diskDirHandle);
     setStatus("Données enregistrées localement");
     refresh();

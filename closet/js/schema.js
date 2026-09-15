@@ -15,18 +15,69 @@ CREATE TABLE IF NOT EXISTS articles (
   symbole_pressing TEXT,
   ajoute_le TEXT DEFAULT (datetime('now'))
 );
+
+CREATE TABLE IF NOT EXISTS categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nom TEXT NOT NULL UNIQUE COLLATE NOCASE,
+  ordre INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS types (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nom TEXT NOT NULL COLLATE NOCASE,
+  categorie_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+  UNIQUE (nom, categorie_id)
+);
+
+INSERT OR IGNORE INTO categories (nom, ordre) VALUES
+  ('Vêtements', 1),
+  ('Linge de maison', 2),
+  ('Autres', 3);
+
+-- Types par défaut : insérés seulement si la table est encore vide
+INSERT INTO types (nom, categorie_id)
+SELECT t.nom, c.id
+FROM (
+  SELECT 'Vêtements' AS cat, 'T-shirt' AS nom UNION ALL
+  SELECT 'Vêtements', 'Chemise' UNION ALL
+  SELECT 'Vêtements', 'Pull' UNION ALL
+  SELECT 'Vêtements', 'Sweat' UNION ALL
+  SELECT 'Vêtements', 'Pantalon' UNION ALL
+  SELECT 'Vêtements', 'Jean' UNION ALL
+  SELECT 'Vêtements', 'Short' UNION ALL
+  SELECT 'Vêtements', 'Robe' UNION ALL
+  SELECT 'Vêtements', 'Jupe' UNION ALL
+  SELECT 'Vêtements', 'Veste' UNION ALL
+  SELECT 'Vêtements', 'Manteau' UNION ALL
+  SELECT 'Vêtements', 'Caleçon' UNION ALL
+  SELECT 'Vêtements', 'Chaussettes' UNION ALL
+  SELECT 'Vêtements', 'Pyjama' UNION ALL
+  SELECT 'Linge de maison', 'Drap' UNION ALL
+  SELECT 'Linge de maison', 'Drap housse' UNION ALL
+  SELECT 'Linge de maison', 'Housse de couette' UNION ALL
+  SELECT 'Linge de maison', 'Taie d''oreiller' UNION ALL
+  SELECT 'Linge de maison', 'Ensemble' UNION ALL
+  SELECT 'Linge de maison', 'Couette' UNION ALL
+  SELECT 'Linge de maison', 'Plaid' UNION ALL
+  SELECT 'Linge de maison', 'Serviette' UNION ALL
+  SELECT 'Linge de maison', 'Torchon' UNION ALL
+  SELECT 'Linge de maison', 'Nappe' UNION ALL
+  SELECT 'Linge de maison', 'Rideau'
+) t
+JOIN categories c ON c.nom = t.cat
+WHERE NOT EXISTS (SELECT 1 FROM types);
+
+-- Rattrape les types déjà saisis sur des articles existants
+INSERT OR IGNORE INTO types (nom, categorie_id)
+SELECT DISTINCT a.type, c.id
+FROM articles a
+JOIN categories c ON c.nom = a.categorie
+WHERE a.type IS NOT NULL AND TRIM(a.type) <> '';
 `;
 
 const EXPORT_FILENAME = "closet.db";
 
-const CATEGORIES = ["Vêtements", "Linge de maison"];
-
 const TEXTILES = ["Coton", "Laine", "Lin", "Soie", "Synthétique / Polyester", "Viscose", "Denim", "Cachemire", "Autre"];
-
-const TYPE_SUGGESTIONS = {
-  "Vêtements": ["T-shirt", "Chemise", "Pull", "Pantalon", "Jean", "Robe", "Jupe", "Veste", "Manteau", "Sous-vêtement", "Chaussettes"],
-  "Linge de maison": ["Drap", "Housse de couette", "Taie d'oreiller", "Serviette", "Torchon", "Nappe", "Rideau"],
-};
 
 // Un symbole par signification (les doublons graphiques du dossier svg/ sont volontairement omis)
 const CARE_LABELS = {

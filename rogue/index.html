@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petit Donjon</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="../manifest.json">
+<meta name="theme-color" content="#1b1726">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+</head>
+<body>
+
+  <div class="page">
+    <header class="topbar">
+      <h1>🗝️ Petit Donjon</h1>
+      <button id="help-btn" class="round-btn" title="Aide" aria-label="Aide">?</button>
+    </header>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="board">
+      <canvas id="game" width="504" height="360"></canvas>
+
+      <div id="overlay" class="overlay">
+        <div class="overlay-card">
+          <h2 id="overlay-title">Petit Donjon</h2>
+          <p id="overlay-text">Descends le plus bas possible.</p>
+          <button id="overlay-btn" class="btn-primary">Jouer</button>
+        </div>
+      </div>
+    </div>
+
+    <ul id="log" class="log"></ul>
+
+    <div class="dpad" aria-label="Contrôles">
+      <button data-dir="0,-1" class="dpad-up" aria-label="Haut">▲</button>
+      <button data-dir="-1,0" class="dpad-left" aria-label="Gauche">◀</button>
+      <button data-dir="0,0" class="dpad-wait" aria-label="Attendre">⏳</button>
+      <button data-dir="1,0" class="dpad-right" aria-label="Droite">▶</button>
+      <button data-dir="0,1" class="dpad-down" aria-label="Bas">▼</button>
+    </div>
+  </div>
+
+  <!-- Aide -->
+  <div id="help-modal" class="modal-overlay">
+    <div class="modal">
+      <h2>Comment jouer</h2>
+      <ul class="help-list">
+        <li><b>Déplacement</b> : flèches, ZQSD, WASD ou le pavé tactile</li>
+        <li><b>Attaquer</b> : marcher sur un monstre</li>
+        <li><b>Attendre un tour</b> : Espace ou ⏳</li>
+        <li><b>Descendre</b> : marcher sur l'escalier 🔽</li>
+        <li><b>Recommencer</b> : R</li>
+      </ul>
+      <ul class="help-list">
+        <li>🧪 Potion : rend 10 PV</li>
+        <li>🗡️ Épée : +1 attaque</li>
+        <li>🛡️ Bouclier : +1 défense</li>
+        <li>💰 Or : augmente le score</li>
+      </ul>
+      <div class="modal-actions">
+        <button type="button" class="btn-primary" id="close-help">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/dungeon.js"></script>
+  <script src="js/game.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js').catch(() => {}));
+    }
+  </script>
+</body>
+</html>

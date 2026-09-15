@@ -1,4 +1,4 @@
-const CACHE_NAME = 'life-projects-v2';
+const CACHE_NAME = 'life-projects-v4';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -32,11 +32,19 @@ const CORE_ASSETS = [
   './pixel-art/js/export.js',
   './pixel-art/js/app.js',
 
+  './rogue/index.html',
+  './rogue/css/style.css',
+  './rogue/js/dungeon.js',
+  './rogue/js/game.js',
+
   './read/index.html',
   './read/css/style.css',
-  './read/js/pages-manifest.js',
-  './read/js/menu-script.js',
-  './read/html/creer-page.html',
+  './read/js/schema.js',
+  './read/js/db.js',
+  './read/js/markdown.js',
+  './read/js/app.js',
+  './read/js/document.js',
+  './read/html/document.html',
 ];
 
 self.addEventListener('install', (event) => {

@@ -14,17 +14,67 @@
 
   <main class="page">
     <h1>Mes documents</h1>
-    <p class="menu-hint">
-      <a href="html/creer-page.html">+ Créer une nouvelle page</a>
-    </p>
+    <p id="summary" class="summary">Chargement…</p>
+
+    <input type="search" id="search-input" class="search-input" placeholder="Rechercher un document">
 
     <ul id="menu-list" class="menu-list">
-      <li class="loading">Chargement du menu…</li>
+      <li class="loading">Chargement…</li>
     </ul>
+
+    <div class="toolbar-mini">
+      <button id="new-btn" class="link-btn">✎ Nouveau document</button>
+      <label class="link-btn file-import-label">
+        ⬆ Importer des .md
+        <input type="file" id="import-md" accept=".md,.markdown,.txt,text/markdown,text/plain" multiple hidden>
+      </label>
+      <button id="export-btn" class="link-btn">⬇ Exporter en .db</button>
+      <label class="link-btn file-import-label">
+        ⬆ Importer un .db
+        <input type="file" id="import-file" accept=".db,.sqlite,.sqlite3" hidden>
+      </label>
+      <button id="disk-sync-btn" class="link-btn">💾 Activer la sauvegarde disque</button>
+    </div>
+
+    <p id="status" class="status">Données enregistrées localement</p>
   </main>
 
-  <script src="js/pages-manifest.js"></script>
-  <script src="js/menu-script.js"></script>
+  <!-- Modal : créer / renommer un document -->
+  <div id="doc-modal" class="modal-overlay">
+    <div class="modal">
+      <h2 id="modal-title">Nouveau document</h2>
+      <form id="doc-form">
+        <label class="field">
+          <span class="field-label">Titre</span>
+          <input type="text" name="titre" placeholder="ex : Recette de crêpes" required>
+        </label>
+
+        <label class="field field-check">
+          <input type="checkbox" name="is_markdown" checked>
+          <span>Le texte est écrit en Markdown (titres #, **gras**, etc.)</span>
+        </label>
+
+        <label class="field">
+          <span class="field-label">Contenu</span>
+          <textarea name="contenu" rows="12" placeholder="Écris ou colle ton texte ici…"></textarea>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="link-btn" id="cancel-doc">Annuler</button>
+          <button type="submit" class="btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ordre important : moteur wasm intégré, puis loader sql.js, puis manager, puis schéma, db, app -->
+  <script src="../vendor-pack/vendor/sqlite/sql-wasm-base64.js"></script>
+  <script src="../vendor-pack/vendor/sqlite/sql-wasm.js"></script>
+  <script src="../vendor-pack/vendor/sqlite/sqlite-manager.js"></script>
+  <script src="../vendor-pack/vendor/fs-sync/disk-sync.js"></script>
+  <script src="js/schema.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js').catch(() => {}));

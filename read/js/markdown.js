@@ -112,21 +112,6 @@ function renderPlainText(text) {
   return `<pre>${escapeHtml(text)}</pre>`;
 }
 
-// ==== Affichage du contenu (défini dans content.js) ====
-function loadContent() {
-  const container = document.getElementById("content");
-
-  try {
-    container.innerHTML = IS_MARKDOWN ? renderMarkdown(CONTENT) : renderPlainText(CONTENT);
-  } catch (err) {
-    container.innerHTML = `<p class="error">Erreur d'affichage : ${err.message}</p>`;
-  }
-}
-
-loadContent();
-
-// ==== Export ====
-
 function downloadBlob(text, filename, mime) {
   const blob = new Blob([text], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -151,18 +136,3 @@ function stripMarkdown(md) {
     .replace(/^[-*]\s+/gm, "• ")
     .replace(/^(-{3,}|\*{3,})$/gm, "");
 }
-
-document.getElementById("export-txt").addEventListener("click", () => {
-  const text = IS_MARKDOWN ? stripMarkdown(CONTENT) : CONTENT;
-  downloadBlob(text, "document.txt", "text/plain;charset=utf-8");
-});
-
-document.getElementById("export-md").addEventListener("click", () => {
-  downloadBlob(CONTENT, "document.md", "text/markdown;charset=utf-8");
-});
-
-document.getElementById("export-pdf").addEventListener("click", () => {
-  // Solution 100% native : boîte d'impression du navigateur
-  // (sur Android/Chrome, elle propose "Enregistrer en PDF")
-  window.print();
-});

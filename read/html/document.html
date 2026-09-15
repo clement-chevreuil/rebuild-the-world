@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document</title>
+<link rel="stylesheet" href="../../vendor-pack/vendor/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="manifest" href="../../manifest.json">
+<meta name="theme-color" content="#2c5f4f">
+</head>
+<body>
+
+  <main class="page">
+    <a href="../index.html" class="back-link no-print">← Retour aux documents</a>
+
+    <section class="toolbar no-print">
+      <button id="edit-btn">✎ Modifier</button>
+      <button id="export-txt">⬇ .txt</button>
+      <button id="export-md">⬇ .md</button>
+      <button id="export-pdf">🖨 .pdf</button>
+      <button id="delete-btn" class="btn-danger">🗑 Supprimer</button>
+    </section>
+
+    <article id="content" class="content">
+      <p class="loading">Chargement…</p>
+    </article>
+
+    <form id="edit-form" class="create-form no-print" hidden>
+      <label>
+        Titre
+        <input type="text" name="titre" required>
+      </label>
+
+      <label class="field-check">
+        <input type="checkbox" name="is_markdown">
+        <span>Le texte est écrit en Markdown</span>
+      </label>
+
+      <label>
+        Contenu
+        <textarea name="contenu" rows="18"></textarea>
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="link-btn" id="cancel-edit">Annuler</button>
+        <button type="submit" class="btn-primary">Enregistrer</button>
+      </div>
+    </form>
+  </main>
+
+  <script src="../../vendor-pack/vendor/sqlite/sql-wasm-base64.js"></script>
+  <script src="../../vendor-pack/vendor/sqlite/sql-wasm.js"></script>
+  <script src="../../vendor-pack/vendor/sqlite/sqlite-manager.js"></script>
+  <script src="../../vendor-pack/vendor/fs-sync/disk-sync.js"></script>
+  <script src="../js/schema.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/markdown.js"></script>
+  <script src="../js/document.js"></script>
+</body>
+</html>
