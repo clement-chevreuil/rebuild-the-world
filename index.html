@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LIFE Projects</title>
   <link rel="stylesheet" href="vendor-pack/vendor/bootstrap/bootstrap.min.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2c5f4f">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <style>
     :root {
       --primary: #2c5f4f;
@@ -108,20 +111,6 @@
   </div>
 
   <div class="projects">
-    <!-- SQL Project -->
-    <div class="project-card">
-      <div class="project-header">
-        <div class="project-icon">🗄️</div>
-        <h2>SQL</h2>
-      </div>
-      <div class="project-body">
-        <p class="project-description">
-          Gestionnaire de base de données SQLite local. Créez, modifiez et exportez vos données sans aucun serveur.
-        </p>
-        <a href="sql/index.html" class="project-link">Ouvrir →</a>
-      </div>
-    </div>
-
     <!-- READ Project -->
     <div class="project-card">
       <div class="project-header">
@@ -170,5 +159,10 @@
   </footer>
 
   <script src="vendor-pack/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    }
+  </script>
 </body>
 </html>
