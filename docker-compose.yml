@@ -7,7 +7,7 @@ services:
     expose:
       - 80
     ports:
-      - "5116:80"
+      - "5003:80"
     networks:
       - my_network
     restart: always
