@@ -16,6 +16,18 @@ Faire des petits logiciels **mignons**, légers, qui ne consomment rien — ni r
 
 **HTML/CSS/JS natif par défaut.** Pas de framework qui impose sa propre façon de penser (React, Vue, etc.) sauf besoin réellement justifié. Le langage du navigateur suffit pour la plupart des besoins.
 
+## Comment le code est écrit
+
+**Plusieurs fichiers, jamais un seul gros fichier.** On découpe par responsabilité (données, rendu, logique de jeu/métier, écran par écran) plutôt que de tout empiler dans un seul `.js` ou un seul `.html`. Un fichier doit se lire d'une traite.
+
+**Clean archi, simple à relire.** Chaque fichier a un rôle clair et ne fait que ça. On préfère du code un peu plus verbeux mais évident, à du code compact mais qu'il faut déchiffrer. Le code se relit facilement même après plusieurs mois sans y toucher.
+
+**JSDoc courte et simple.** Une ou deux lignes par fonction, avec des mots simples — pas de jargon inutile. Le but est de comprendre en une lecture ce que fait la fonction, pas de documenter chaque paramètre en détail.
+
+**Interface en composants, un fichier par composant.** Le HTML/JS d'un écran ou d'un élément réutilisable (une carte, une modale, une barre de vie) vit dans son propre fichier plutôt que mélangé avec le reste. On peut retrouver un composant sans avoir à fouiller tout le projet.
+
+**CSS bien nommée et structurée.** Des classes qui décrivent ce qu'elles sont (`.carte-heros`, `.slot-vide`) plutôt que ce qu'elles font visuellement. Le fichier CSS est découpé par section commentée (mise en page, composants, écrans) pour qu'on retrouve vite la bonne règle.
+
 ## Pourquoi
 
 Un logiciel qui dépend d'un serveur, d'une compilation ou d'un service externe est un logiciel qui peut casser sans qu'on y touche : une dépendance qui change de version, un service qui ferme, une connexion qui manque. Un logiciel natif, autonome et local ne casse pas tout seul — il continue de fonctionner exactement comme le jour où il a été créé, indéfiniment.
