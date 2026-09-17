@@ -12,7 +12,9 @@ const categorieSegmented = document.getElementById("categorie-segmented");
 const categorieValue = document.getElementById("categorie-value");
 const typeInput = document.getElementById("type-input");
 const typeSuggestions = document.getElementById("type-suggestions");
-const textileSelect = document.getElementById("textile-select");
+const textileRowsEl = document.getElementById("textile-rows");
+const textileTotalEl = document.getElementById("textile-total");
+const addTextileRowBtn = document.getElementById("add-textile-row");
 const imageInput = document.getElementById("image-input");
 const imagePreview = document.getElementById("image-preview");
 const fileName = document.getElementById("file-name");
@@ -23,11 +25,24 @@ const legendModal = document.getElementById("legend-modal");
 const legendContent = document.getElementById("legend-content");
 const closeLegendBtn = document.getElementById("close-legend");
 
+const filterBtn = document.getElementById("filter-btn");
+const filterModal = document.getElementById("filter-modal");
+const filterContent = document.getElementById("filter-content");
+const resetFiltersBtn = document.getElementById("reset-filters");
+const closeFiltersBtn = document.getElementById("close-filters");
+
 let filterCategorie = "Toutes";
 let searchText = "";
 let pendingImage = null;
 let editingId = null;
 let careSelection = {};
+let textileRows = [];
+
+let activeFilters = {
+  types: new Set(),
+  textiles: new Set(),
+  care: Object.fromEntries(CARE_FIELDS.map((f) => [f, new Set()])),
+};
 
 function escapeHtml(str) {
   return String(str)
@@ -58,9 +73,37 @@ function buildPills() {
 
 // ==== Rendu ====
 
+function countActiveFilters() {
+  let n = activeFilters.types.size + activeFilters.textiles.size;
+  CARE_FIELDS.forEach((field) => (n += activeFilters.care[field].size));
+  return n;
+}
+
+function matchesFilters(item) {
+  if (activeFilters.types.size && !activeFilters.types.has(item.type || "")) return false;
+
+  if (activeFilters.textiles.size) {
+    const textiles = (item.textiles || []).map((t) => t.textile);
+    if (!textiles.some((t) => activeFilters.textiles.has(t))) return false;
+  }
+
+  for (const field of CARE_FIELDS) {
+    const set = activeFilters.care[field];
+    if (set.size && !set.has(item[`symbole_${field}`] || "")) return false;
+  }
+
+  return true;
+}
+
+function updateFilterBtnState() {
+  const n = countActiveFilters();
+  filterBtn.classList.toggle("has-active", n > 0);
+  filterBtn.title = n > 0 ? `Filtres actifs (${n})` : "Filtrer";
+}
+
 function refresh() {
   buildPills();
-  const rows = getArticles({ categorie: filterCategorie, search: searchText.trim() });
+  const rows = getArticles({ categorie: filterCategorie, search: searchText.trim() }).filter(matchesFilters);
   const total = getArticles({}).length;
 
   summaryEl.textContent = `${total} article${total > 1 ? "s" : ""}`;
@@ -102,7 +145,13 @@ function renderCareIcons(item) {
   return `<div class="item-care">${icons.join("")}</div>`;
 }
 
+function formatTextiles(textiles) {
+  if (!textiles || textiles.length === 0) return "";
+  return textiles.map((t) => `${t.pourcentage}% ${t.textile}`).join(", ");
+}
+
 function renderCard(item) {
+  const textileText = formatTextiles(item.textiles);
   return `
     <div class="item-card">
       <div class="item-image">
@@ -110,7 +159,7 @@ function renderCard(item) {
       </div>
       <div class="item-content">
         <div class="item-name">${escapeHtml(item.nom)}</div>
-        ${item.type || item.textile ? `<div class="item-meta">${escapeHtml([item.type, item.textile].filter(Boolean).join(" · "))}</div>` : ""}
+        ${item.type || textileText ? `<div class="item-meta">${escapeHtml([item.type, textileText].filter(Boolean).join(" · "))}</div>` : ""}
         <div class="item-badges">
           <span class="badge">${escapeHtml(item.categorie)}</span>
         </div>
@@ -146,9 +195,58 @@ function updateTypeSuggestions(categorie) {
   typeSuggestions.innerHTML = suggestions.map((t) => `<option value="${escapeHtml(t)}">`).join("");
 }
 
-function buildTextileOptions() {
-  textileSelect.innerHTML = `<option value="">Choisir…</option>` + TEXTILES.map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+function renderTextileRows() {
+  textileRowsEl.innerHTML = textileRows
+    .map(
+      (row, i) => `
+      <div class="textile-row">
+        <select class="textile-row-select" data-index="${i}">
+          <option value="">Choisir…</option>
+          ${TEXTILES.map((t) => `<option value="${escapeHtml(t)}"${row.textile === t ? " selected" : ""}>${escapeHtml(t)}</option>`).join("")}
+        </select>
+        <input type="number" class="textile-row-pct" data-index="${i}" min="0" max="100" value="${row.pourcentage}">
+        <span class="textile-pct-sign">%</span>
+        <button type="button" class="textile-row-remove" data-index="${i}" aria-label="Retirer ce textile">✕</button>
+      </div>
+    `
+    )
+    .join("");
+
+  textileRowsEl.querySelectorAll(".textile-row-select").forEach((sel) => {
+    sel.addEventListener("change", () => {
+      textileRows[Number(sel.dataset.index)].textile = sel.value;
+    });
+  });
+  textileRowsEl.querySelectorAll(".textile-row-pct").forEach((input) => {
+    input.addEventListener("input", () => {
+      textileRows[Number(input.dataset.index)].pourcentage = Number(input.value) || 0;
+      updateTextileTotal();
+    });
+  });
+  textileRowsEl.querySelectorAll(".textile-row-remove").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      textileRows.splice(Number(btn.dataset.index), 1);
+      renderTextileRows();
+    });
+  });
+
+  updateTextileTotal();
 }
+
+function updateTextileTotal() {
+  const total = textileRows.reduce((sum, r) => sum + (r.pourcentage || 0), 0);
+  if (textileRows.length === 0) {
+    textileTotalEl.textContent = "";
+    return;
+  }
+  textileTotalEl.textContent = `Total : ${total}%`;
+  textileTotalEl.classList.toggle("mismatch", total !== 100);
+}
+
+addTextileRowBtn.addEventListener("click", () => {
+  textileRows.push({ textile: "", pourcentage: textileRows.length ? 0 : 100 });
+  renderTextileRows();
+});
 
 function renderCarePickers() {
   carePickersEl.innerHTML = CARE_FIELDS
@@ -196,6 +294,7 @@ function resetModal() {
   pendingImage = null;
   editingId = null;
   careSelection = {};
+  textileRows = [{ textile: "", pourcentage: 100 }];
   imagePreview.innerHTML = "";
   fileName.textContent = "Aucun fichier choisi";
   const [firstCategorie] = getCategories();
@@ -203,6 +302,7 @@ function resetModal() {
   categorieValue.value = firstCategorie;
   updateTypeSuggestions(firstCategorie);
   renderCarePickers();
+  renderTextileRows();
 }
 
 function openAddModal() {
@@ -225,7 +325,8 @@ function openEditModal(id) {
   updateTypeSuggestions(item.categorie);
 
   typeInput.value = item.type || "";
-  textileSelect.value = item.textile || "";
+  textileRows = item.textiles && item.textiles.length ? item.textiles.map((t) => ({ ...t })) : [{ textile: "", pourcentage: 100 }];
+  renderTextileRows();
 
   if (item.image) {
     pendingImage = item.image;
@@ -272,7 +373,7 @@ articleForm.addEventListener("submit", (e) => {
     nom,
     categorie,
     type: typeInput.value.trim(),
-    textile: textileSelect.value,
+    textiles: textileRows.filter((r) => r.textile).map((r) => ({ textile: r.textile, pourcentage: r.pourcentage || 0 })),
     image: pendingImage,
     symbole_lavage: careSelection.lavage,
     symbole_blanchiment: careSelection.blanchiment,
@@ -373,12 +474,104 @@ legendModal.addEventListener("click", (e) => {
   if (e.target === legendModal) legendModal.classList.remove("active");
 });
 
+// ==== Filtrer ====
+
+function renderFilterCheckbox(kind, value, label) {
+  const set = kind === "type" ? activeFilters.types : activeFilters.textiles;
+  return `
+    <label class="filter-option">
+      <input type="checkbox" data-kind="${kind}" value="${escapeHtml(value)}"${set.has(value) ? " checked" : ""}>
+      ${escapeHtml(label)}
+    </label>
+  `;
+}
+
+function buildFilterContent() {
+  const typeOptions = getAllTypes();
+
+  const typeSection = `
+    <div class="filter-group">
+      <h3 class="legend-group-title">Type</h3>
+      <div class="filter-options">
+        ${typeOptions.map((t) => renderFilterCheckbox("type", t, t)).join("") || `<p class="filter-empty">Aucun type enregistré</p>`}
+      </div>
+    </div>
+  `;
+
+  const textileSection = `
+    <div class="filter-group">
+      <h3 class="legend-group-title">Textile</h3>
+      <div class="filter-options">
+        ${TEXTILES.map((t) => renderFilterCheckbox("textile", t, t)).join("")}
+      </div>
+    </div>
+  `;
+
+  const careSections = CARE_FIELDS.map((field) => {
+    const set = activeFilters.care[field];
+    return `
+      <div class="filter-group">
+        <h3 class="legend-group-title">${escapeHtml(CARE_LABELS[field])}</h3>
+        <div class="filter-care-list">
+          <label class="filter-care-option">
+            <input type="checkbox" data-kind="care" data-field="${field}" value=""${set.has("") ? " checked" : ""}>
+            <span class="icon-none">–</span>
+            <span>Non précisé</span>
+          </label>
+          ${CARE_OPTIONS[field]
+            .map(
+              (opt) => `
+            <label class="filter-care-option">
+              <input type="checkbox" data-kind="care" data-field="${field}" value="${opt.file}"${set.has(opt.file) ? " checked" : ""}>
+              <img src="svg/${opt.file}" alt="${escapeHtml(opt.label)}">
+              <span>${escapeHtml(opt.label)}</span>
+            </label>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  filterContent.innerHTML = typeSection + textileSection + careSections;
+
+  filterContent.querySelectorAll("input[type=checkbox]").forEach((input) => {
+    input.addEventListener("change", () => {
+      const kind = input.dataset.kind;
+      const set = kind === "type" ? activeFilters.types : kind === "textile" ? activeFilters.textiles : activeFilters.care[input.dataset.field];
+      if (input.checked) set.add(input.value);
+      else set.delete(input.value);
+      updateFilterBtnState();
+      refresh();
+    });
+  });
+}
+
+filterBtn.addEventListener("click", () => {
+  buildFilterContent();
+  filterModal.classList.add("active");
+});
+
+resetFiltersBtn.addEventListener("click", () => {
+  activeFilters.types.clear();
+  activeFilters.textiles.clear();
+  CARE_FIELDS.forEach((field) => activeFilters.care[field].clear());
+  buildFilterContent();
+  updateFilterBtnState();
+  refresh();
+});
+
+closeFiltersBtn.addEventListener("click", () => filterModal.classList.remove("active"));
+filterModal.addEventListener("click", (e) => {
+  if (e.target === filterModal) filterModal.classList.remove("active");
+});
+
 // ==== Démarrage ====
 
 async function boot() {
   try {
     setStatus("Initialisation de la base…");
-    buildTextileOptions();
     await initDatabase();
     buildCategorieSegmented();
     updateDiskSyncLabel(!!diskDirHandle);

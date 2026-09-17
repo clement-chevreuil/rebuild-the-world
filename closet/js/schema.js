@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS articles (
   nom TEXT NOT NULL,
   categorie TEXT NOT NULL DEFAULT 'Vêtements',
   type TEXT,
-  textile TEXT,
+  textile TEXT, -- ancien champ, remplacé par article_textiles (gardé pour la migration des bases existantes)
   image TEXT,
   symbole_lavage TEXT,
   symbole_blanchiment TEXT,
@@ -27,6 +27,14 @@ CREATE TABLE IF NOT EXISTS types (
   nom TEXT NOT NULL COLLATE NOCASE,
   categorie_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
   UNIQUE (nom, categorie_id)
+);
+
+-- Un article peut être composé de plusieurs textiles, chacun avec son pourcentage
+CREATE TABLE IF NOT EXISTS article_textiles (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  article_id INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+  textile TEXT NOT NULL,
+  pourcentage INTEGER NOT NULL DEFAULT 100
 );
 
 INSERT OR IGNORE INTO categories (nom, ordre) VALUES

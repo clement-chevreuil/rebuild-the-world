@@ -17,7 +17,10 @@
         <h1>Mon dressing</h1>
         <p id="summary" class="summary">Chargement…</p>
       </div>
-      <button id="legend-btn" class="legend-btn" title="Récapitulatif des symboles" aria-label="Récapitulatif des symboles">📖</button>
+      <div class="topbar-actions">
+        <button id="filter-btn" class="legend-btn" title="Filtrer" aria-label="Filtrer">🎚</button>
+        <button id="legend-btn" class="legend-btn" title="Récapitulatif des symboles" aria-label="Récapitulatif des symboles">📖</button>
+      </div>
     </header>
 
     <input type="search" id="search-input" class="search-input" placeholder="Rechercher un article">
@@ -54,18 +57,17 @@
         <div class="segmented" id="categorie-segmented"></div>
         <input type="hidden" name="categorie" id="categorie-value">
 
-        <div class="modal-row">
-          <label class="field">
-            <span class="field-label">Type</span>
-            <input type="text" name="type" id="type-input" list="type-suggestions" placeholder="ex : Pull">
-            <datalist id="type-suggestions"></datalist>
-          </label>
-          <label class="field">
-            <span class="field-label">Textile</span>
-            <select name="textile" id="textile-select">
-              <option value="">Choisir…</option>
-            </select>
-          </label>
+        <label class="field">
+          <span class="field-label">Type</span>
+          <input type="text" name="type" id="type-input" list="type-suggestions" placeholder="ex : Pull">
+          <datalist id="type-suggestions"></datalist>
+        </label>
+
+        <div class="field-label">Composition textile</div>
+        <div id="textile-rows" class="textile-rows"></div>
+        <div class="textile-footer">
+          <button type="button" class="link-btn" id="add-textile-row">+ Ajouter un textile</button>
+          <span id="textile-total" class="textile-total"></span>
         </div>
 
         <div class="field-label">Photo (optionnel)</div>
@@ -96,6 +98,18 @@
       <div id="legend-content"></div>
       <div class="modal-actions">
         <button type="button" class="link-btn" id="close-legend">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal : filtrer -->
+  <div id="filter-modal" class="modal-overlay">
+    <div class="modal modal-legend">
+      <h2>Filtrer</h2>
+      <div id="filter-content"></div>
+      <div class="modal-actions">
+        <button type="button" class="link-btn" id="reset-filters">Réinitialiser</button>
+        <button type="button" class="btn-primary" id="close-filters">Fermer</button>
       </div>
     </div>
   </div>
